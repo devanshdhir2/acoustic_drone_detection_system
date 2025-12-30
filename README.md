@@ -1,100 +1,169 @@
-# Acoustic UAV Detection System
+# Acoustic-Based Drone Detection System 🚁📡
 
-## Overview
+![Status](https://img.shields.io/badge/Status-Completed-success)
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![Hardware](https://img.shields.io/badge/Hardware-Raspberry_Pi_5-red)
 
-This project develops an innovative acoustic-based system for detecting unmanned aerial vehicles (UAVs) through analysis of their unique sound signatures. Using microphones and acoustic sensors, the system captures drone noises in various environments and employs advanced signal processing and machine learning techniques to accurately distinguish drone sounds from background noise. Additionally, the system estimates the direction and distance of detected drones using sound intensity analysis and time-delay localization methods, providing critical spatial information for timely responses.
+**Real-Time UAV Identification and Localization using Edge AI**
 
-## Features
+---
 
-- **Acoustic Sensing**: Utilizes microphones and acoustic sensors to capture UAV sound signatures.
-- **Signal Processing**: Applies filters and spectral analysis to preprocess audio data and enhance drone sound characteristics.
-- **Machine Learning**: Implements classification models (e.g., SVM, CNN) to differentiate drone noises from ambient sounds.
-- **Localization**: Estimates direction and distance of drones using time-delay of arrival (TDOA) and sound intensity analysis.
-- **Environment Adaptability**: Evaluates performance across diverse settings such as urban areas, event venues, and sensitive locations.
+## 📖 Table of Contents
 
-## Architecture
+- [About the Project](#-about-the-project)
+- [Key Features](#-key-features)
+- [System Architecture](#-system-architecture)
+- [Hardware Requirements](#-hardware-requirements)
+- [Tech Stack](#-tech-stack)
+- [Dataset](#-dataset)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Results & Performance](#-results--performance)
+- [Team & Acknowledgements](#-team--acknowledgements)
+- [License](#-license)
 
-```
-+----------------+       +----------------+       +-----------------+
-| Acoustic Input | --->  | Preprocessing  | --->  | Feature Extract |
-|  (Microphones) |       | (Filtering,    |       | (MFCC, Spectra) |
-+----------------+       |  Noise Supp.)  |       +-----------------+
-                            |
-                            v
-                     +-----------------+
-                     | Classification  |
-                     |  (ML Models)    |
-                     +-----------------+
-                            |
-                            v
-                     +-----------------+
-                     | Localization    |
-                     | (TDOA, Intensity)|
-                     +-----------------+
-                            |
-                            v
-                     +-----------------+
-                     | Visualization & |
-                     |   Reporting     |
-                     +-----------------+
-```
+---
 
-## Getting Started
+## 📝 About the Project
 
-### Prerequisites
+Unmanned Aerial Vehicles (UAVs) pose increasing security risks to critical infrastructure and personal privacy. Traditional detection techniques such as radar and vision-based systems often struggle with small consumer drones, cluttered environments, or low-light conditions.
 
-- Python 3.8+
-- Dependencies listed in `requirements.txt`:
-  - numpy
-  - scipy
-  - scikit-learn
-  - librosa
-  - sounddevice
-  - matplotlib
+**Acoustic Drone Detection System** designed for real-time airspace monitoring. It uses a **Raspberry Pi 5** and a **Seeed Studio ReSpeaker 4-Mic Array** to capture the unique acoustic signatures of drone motors. A lightweight **Random Forest** machine-learning model classifies incoming audio and estimates the **Direction of Arrival (DOA)**, enabling rapid localization. The entire system runs **offline at the edge**, ensuring privacy and low latency.
 
-### Installation
+---
+
+## ✨ Key Features
+
+- **🌲 Edge AI Core:** Optimized Random Forest classifier achieving **~96% accuracy** with sub-350 ms inference latency.
+- **🧭 Real-Time Localization:** Estimates sound source direction (0°–360°) using Time Difference of Arrival (TDOA) from the 4-microphone array.
+- **🔇 Intelligent Noise Filtering:** Differentiates drones from wind, traffic, and human speech using MFCC, spectral, and temporal features.
+- **🖥️ Tactical Dashboard:** Standalone Python GUI with radar-style visualization and clear detection status (Red/Green).
+- **🔒 Privacy-First:** Fully offline operation with no cloud dependency.
+- **⚡ Automatic Gain Control (AGC):** Dynamically adjusts microphone sensitivity to detect distant drones.
+
+---
+
+## 🏗 System Architecture
+
+The system follows a modular, real-time processing pipeline:
+
+1. **Audio Capture:** Raw multi-channel audio input from the ReSpeaker 4-Mic Array
+2. **Preprocessing:** Noise reduction, framing, normalization, and digital AGC
+3. **Feature Extraction:** MFCCs, Spectral Contrast, Chroma, and Zero-Crossing Rate using `librosa`
+4. **Inference Engine:** Random Forest model classifies audio as **Drone** or **Noise**
+5. **Localization:** DOA algorithm estimates the angle of arrival when a drone is detected
+6. **Visualization:** Radar dashboard updates with target position and confidence
+
+---
+
+## 🛠 Hardware Requirements
+
+- **Single Board Computer:** Raspberry Pi 5 (8 GB RAM recommended)
+- **Microphone Array:** Seeed Studio ReSpeaker 4-Mic Array (USB)
+- **Power Supply:** USB-C PD 27 W
+- **Cooling:** Raspberry Pi Active Cooler
+- **Display:** HDMI monitor
+- **Storage:** High-speed microSD card (32 GB or higher)
+
+---
+
+## 💻 Tech Stack
+
+- **Programming Language:** Python 3.11
+- **Machine Learning:** Scikit-learn, Joblib
+- **Audio Processing:** Librosa, NumPy, PyAudio, SciPy
+- **Hardware Interface:** Seeed Voicecard Drivers
+- **Visualization & GUI:** Matplotlib (Animation API), Tkinter
+
+---
+
+## 📊 Dataset
+
+A custom dataset was created using real-world recordings of commercial quadcopters and diverse environmental noise samples.
+
+🔗 **Dataset:**  
+https://www.kaggle.com/datasets/gautamdhawan55/merged-drone
+
+**Dataset Structure**
+
+- `drone/` – 148+ UAV motor sound samples
+- `noise/` – 125+ ambient noise samples
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/acoustic-uav-detection.git
-cd acoustic-uav-detection
+git clone https://github.com/your-username/acoustic-drone-detection.git
+cd acoustic-drone-detection
+```
+
+### 2. Install System Dependencies (Raspberry Pi)
+
+```bash
+sudo apt update
+sudo apt install python3-pyaudio portaudio19-dev libatlas-base-dev
+```
+
+### 3. Install Python Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-## Usage
+---
 
-1. **Data Collection**: Configure microphones and run `record_audio.py` to capture environmental and UAV audio samples.
-2. **Preprocessing**: Execute `preprocess.py` to apply noise reduction and filtering.
-3. **Training**: Use `train_model.py` to train classification models on labeled audio features.
-4. **Detection**: Launch `detect_uav.py` for real-time UAV detection and localization.
-5. **Visualization**: Run `visualize_results.py` to view detection logs and spatial plots.
+## 🚀 Usage
 
-## Project Structure
+### Phase 1: Model Training (Optional)
 
-```
-├── data/
-│   ├── raw/           # Raw audio recordings
-│   └── processed/     # Preprocessed audio files
-├── src/
-│   ├── record_audio.py
-│   ├── preprocess.py
-│   ├── feature_extraction.py
-│   ├── train_model.py
-│   ├── detect_uav.py
-│   └── visualize_results.py
-├── models/            # Saved ML models
-├── requirements.txt
-└── README.md
+1. Place the dataset folder inside the project directory
+2. Open `training.ipynb`
+3. Run all cells to preprocess audio and train the model
+4. Generated files:
+   - `drone_brain_v2.pkl`
+   - `feature_scaler.pkl`
+
+---
+
+### Phase 2: Real-Time Deployment
+
+```bash
+python3 main.py
 ```
 
-## Evaluation
+The radar dashboard will launch and highlight detected drones in **red** with direction locking.
 
-The system is tested in multiple scenarios to assess detection accuracy, localization error, and robustness against background noise. Performance metrics such as precision, recall, F1-score, and mean localization error are reported.
+---
 
-## Contributing
+## 📈 Results & Performance
 
-Contributions are welcome! Please open issues or submit pull requests for bug fixes, feature enhancements, or documentation improvements.
+- **Classification Accuracy:** 96.32%
+- **Inference Latency:** < 350 ms per audio chunk
+- **Detection Range:** ~10 meters
+- **Localization Accuracy:** ±15° error
+- **Thermal Stability:** CPU temperature < 65 °C
 
-## License
+---
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## 👥 Team & Acknowledgements
 
+**Capstone Project (CPG-179)**  
+**Thapar Institute of Engineering & Technology, Patiala**
+
+**Team Members**
+
+- Miet Pamecha (102203012)
+- Gautam Dhawan (102203061)
+- Lipsita Devgan (102203408)
+- Tamanna Bajaj (102203413)
+- Devansh Dhir (102203449)
+
+**Faculty Mentor**
+
+- **Dr. Sharad Saxena**  
+  Associate Professor, Department of Computer Science & Engineering
+
+---
